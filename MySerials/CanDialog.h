@@ -110,5 +110,9 @@ public:
 	afx_msg void OnBnClickedButtonScrn();
 	CEdit m_edit_touch_x;
 	CEdit m_edit_touch_y;
+	CSliderCtrl m_slider_x;
+	CSliderCtrl m_slider_y;
+	afx_msg void OnNMCustomdrawSliderX(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMCustomdrawSliderY(NMHDR *pNMHDR, LRESULT *pResult);
 };
 

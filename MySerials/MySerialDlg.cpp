@@ -284,8 +284,12 @@ void CMySerialDlg::OnSize(UINT nType, int cx, int cy)
 
 	// TODO:  在此处添加消息处理程序代码
 
-	ChangeSize(IDC_TAB_MAIN,cx,cy);
-	GetClientRect(&m_rect);
+
+	if (cx != 0 && cy != 0)
+	{
+		ChangeSize(IDC_TAB_MAIN, cx, cy);
+		GetClientRect(&m_rect);
+	}
 
 }
 

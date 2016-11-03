@@ -43,6 +43,8 @@ void CCanDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_SND_cycle, m_edit_cycle);
 	DDX_Control(pDX, IDC_EDIT_TOUCH_X, m_edit_touch_x);
 	DDX_Control(pDX, IDC_EDIT_TOUCH_Y, m_edit_touch_y);
+	DDX_Control(pDX, IDC_SLIDER_X, m_slider_x);
+	DDX_Control(pDX, IDC_SLIDER_Y, m_slider_y);
 }
 
 
@@ -95,6 +97,8 @@ BEGIN_MESSAGE_MAP(CCanDialog, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_STOPSND, &CCanDialog::OnBnClickedButtonStopsnd)
 	ON_BN_CLICKED(IDC_BUTTON_COM_PORT2, &CCanDialog::OnBnClickedButtonComPort2)
 	ON_BN_CLICKED(IDC_BUTTON_SCRN, &CCanDialog::OnBnClickedButtonScrn)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER_X, &CCanDialog::OnNMCustomdrawSliderX)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER_Y, &CCanDialog::OnNMCustomdrawSliderY)
 END_MESSAGE_MAP()
 
 
@@ -110,8 +114,8 @@ BOOL CCanDialog::OnInitDialog()
 	m_canData = new CanMatrix;
 	
 	m_slider_speed.SetRange(0, 120);
-	m_slider_angle.SetRange(0,780*2);
-	m_slider_angle.SetPos(780);
+	m_slider_angle.SetRange(0,0x3cef);
+	m_slider_angle.SetPos(0);
 
 	m_receiver.setDlg(this);
 	m_canDevice->add_data_receiver(&m_receiver);
@@ -480,8 +484,8 @@ void CCanDialog::OnBnClickedButtonScrn()
 	m_canData->setIce4_touchKey_x(x);
 	m_canData->setIce4_touchKey_y(y);
 	m_canDevice->CanSendNormalData(m_canData->setIce4_touchKey_press(ICE4_TOUCHKEY_PRESS));
-	//Sleep(30);
-	//m_canDevice->CanSendNormalData(m_canData->setIce4_touchKey_press(ICE4_TOUCHKEY_NOPRESS));
+	Sleep(30);
+	m_canDevice->CanSendNormalData(m_canData->setIce4_touchKey_press(ICE4_TOUCHKEY_NOPRESS));
 }
 
 
@@ -496,11 +500,15 @@ void CCanDialog::OnBnClickedRadioIce5()
 	if (IsDlgButtonChecked(IDC_RADIO_ICE5_800_600))
 	{
 		m_canDevice->CanSendNormalData(m_canData->setIce5_resolution_screen(ICE5_RESLUTION_800_600));
+		m_slider_x.SetRange(0, 800);
+		m_slider_y.SetRange(0, 600);
 	}
 
 	else if (IsDlgButtonChecked(IDC_RADIO_ICE5_1024_600))
 	{
 		m_canDevice->CanSendNormalData(m_canData->setIce5_resolution_screen(ICE5_RESLUTION_1024_600));
+		m_slider_x.SetRange(0, 1024);
+		m_slider_y.SetRange(0, 600);
 	}
 }
 
@@ -549,7 +557,7 @@ void CCanDialog::OnEnChangeEditAngle()
 
 	angle = _ttoi(strAngle);
 	m_canDevice->CanSendNormalData(m_canData->setSas1_steering_angle(angle));
-	m_slider_angle.SetPos(angle+780);
+	m_slider_angle.SetPos(angle);
 }
 
 
@@ -559,11 +567,10 @@ void CCanDialog::OnNMCustomdrawSliderAngle(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	// TODO:  在此添加控件通知处理程序代码
 	CString strAngle;
-	//-780 ~ 780 ==> 0 ~ 780*2
 	int angle = m_slider_angle.GetPos();
 	if (i != angle)
 	{
-		strAngle.Format(L"%d", angle-780);
+		strAngle.Format(L"%d", angle);
 		m_edit_angle.SetWindowText(strAngle);
 		i = angle;
 	}
@@ -607,11 +614,14 @@ void CCanDialog::OnBnClickedButtonSnd()
 
 	if (m_canDevice->IsDeviceOpen())
 	{
-		m_edit_snd_data.EnableWindow(false);
-		m_edit_send_id.EnableWindow(false);
-		m_edit_cycle.EnableWindow(false);
-		m_btn_send.EnableWindow(false);
-		m_edit_send_stop.EnableWindow(true);
+		if (packetBuf.tmInterval)
+		{
+			m_edit_snd_data.EnableWindow(false);
+			m_edit_send_id.EnableWindow(false);
+			m_edit_cycle.EnableWindow(false);
+			m_btn_send.EnableWindow(false);
+			m_edit_send_stop.EnableWindow(true);
+		}
 		
 		m_canDevice->CanSendNormalData(packetBuf);
 	}
@@ -711,3 +721,39 @@ void c_dlg_data_receiver::receive(const VCI_CAN_OBJ * ba, int cb)
 }
 
 
+
+
+void CCanDialog::OnNMCustomdrawSliderX(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	static int i = -1;
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO:  在此添加控件通知处理程序代码
+
+	CString strSpd;
+	int v = m_slider_x.GetPos();
+	if (i != v)
+	{
+		strSpd.Format(L"%d", v);
+		m_edit_touch_x.SetWindowText(strSpd);
+		i = v;
+	}
+	*pResult = 0;
+}
+
+
+void CCanDialog::OnNMCustomdrawSliderY(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	static int i = -1;
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO:  在此添加控件通知处理程序代码
+
+	CString strSpd;
+	int v = m_slider_y.GetPos();
+	if (i != v)
+	{
+		strSpd.Format(L"%d", v);
+		m_edit_touch_y.SetWindowText(strSpd);
+		i = v;
+	}
+	*pResult = 0;
+}

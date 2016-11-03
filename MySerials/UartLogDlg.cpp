@@ -79,6 +79,7 @@ int CUartLogDlg::AddLog(CString str)
 {
 	if (m_stop_refresh)
 		return 0;
+#if 1
 	if (str == "\r")
 	{
 	}
@@ -92,7 +93,9 @@ int CUartLogDlg::AddLog(CString str)
 	{
 		m_str_newLine.Append(str);
 	}
-
+#else
+	m_richEdit.Append(str, false);
+#endif
 	return 0;
 }
 

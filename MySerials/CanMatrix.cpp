@@ -215,7 +215,7 @@ CanMatrix::CanMatrix()
 		true,
 		0,
 		0x3b0,
-		{ 0, }
+		{ 0,0x04,0, }
 	};
 	m_snd_ice5_resolution_screen = {
 		1,
@@ -497,6 +497,9 @@ ST_PACKET CanMatrix::setIce4_touchKey_press(int value)
 {
 	m_snd_ice4_avmKey.value = 0;
 	m_snd_ice4_calibKey.value = 0;
+	m_snd_ice4_sideViewEnable.value = m_snd_ice4_sideViewEnable.mask;
+	m_snd_ice4_pdcViewDisp.value = m_snd_ice4_pdcViewDisp.mask;
+	m_snd_ice4_carColor.value = m_snd_ice4_carColor.mask;
 
 	m_snd_ice4_touchKey_press.value = value;
 	return buildIce4();
@@ -518,9 +521,9 @@ ST_PACKET CanMatrix::buildIce4()
 	m_snd_ice4.data[m_snd_ice4_calibKey.bytes] = m_snd_ice4.data[m_snd_ice4_calibKey.bytes] & (~m_snd_ice4_calibKey.mask) | m_snd_ice4_calibKey.value;
 	m_snd_ice4.data[m_snd_ice4_touchKey_press.bytes] = m_snd_ice4.data[m_snd_ice4_touchKey_press.bytes] & (~m_snd_ice4_touchKey_press.mask) | m_snd_ice4_touchKey_press.value;
 	
-	m_snd_ice4.data[m_snd_ice4_touchKey_x.bytes] = m_snd_ice4.data[m_snd_ice4_touchKey_x.bytes] & (~(m_snd_ice4_touchKey_x.mask>>8)) | (m_snd_ice4_touchKey_x.value >>8);
+	m_snd_ice4.data[m_snd_ice4_touchKey_x.bytes] = m_snd_ice4.data[m_snd_ice4_touchKey_x.bytes] & (~(m_snd_ice4_touchKey_x.mask>>4)) | (m_snd_ice4_touchKey_x.value >>4);
 	m_snd_ice4.data[m_snd_ice4_touchKey_x.bytes + 1] = m_snd_ice4.data[m_snd_ice4_touchKey_x.bytes + 1] & (~m_snd_ice4_touchKey_x.mask) | (m_snd_ice4_touchKey_x.value & 0xff);
-	m_snd_ice4.data[m_snd_ice4_touchKey_y.bytes] = m_snd_ice4.data[m_snd_ice4_touchKey_y.bytes] & (~(m_snd_ice4_touchKey_y.mask >> 8)) | (m_snd_ice4_touchKey_y.value >> 8);
+	m_snd_ice4.data[m_snd_ice4_touchKey_y.bytes] = m_snd_ice4.data[m_snd_ice4_touchKey_y.bytes] & (~(m_snd_ice4_touchKey_y.mask >> 4)) | (m_snd_ice4_touchKey_y.value >> 4);
 	m_snd_ice4.data[m_snd_ice4_touchKey_y.bytes + 1] = m_snd_ice4.data[m_snd_ice4_touchKey_y.bytes + 1] & (~m_snd_ice4_touchKey_y.mask) | (m_snd_ice4_touchKey_y.value & 0xff);
 	return m_snd_ice4;
 }

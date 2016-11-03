@@ -120,7 +120,7 @@ bool CanDevice::CanSend(int iChannel, VCI_CAN_OBJ * sendBuf, int frames)
 	int flag = VCI_Transmit(m_DevType, m_DevIndex, iChannel, sendBuf, frames);//CAN message send
 	if (flag<1)
 	{
-#ifdef DEBUG
+#if 0//def _DEBUG
 		if (flag == -1)
 			AfxMessageBox(L"failed- device not open\n");
 		else if (flag == 0)

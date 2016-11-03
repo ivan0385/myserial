@@ -47,6 +47,26 @@ void CRichEditCtrlEx::Append(LPCTSTR text, bool newline, bool link, int nLinkBeg
 	this->GetSel(oldsel);
 	SetSel(-1, -1);
 	ReplaceSel((LPCTSTR)text);
+
+
+#if 0
+	//======设置指定区域的字体和颜色//for PASSED show
+	CHARFORMAT cf;
+	ZeroMemory(&cf, sizeof(CHARFORMAT));
+	cf.cbSize = sizeof(CHARFORMAT);
+	cf.dwMask = CFM_COLOR;
+	cf.crTextColor = RGB(0, 255, 512); //文字颜色
+	//===========================================//查找关键字的起始位置
+	int metStrCount = 0;
+	CString keyWord = m_key;
+	StrSearch_Passed(m_richStr, keyWord, &metStrCount);
+	for (int k = 0; k<metStrCount; k++)
+	{
+		m_richEd.SetSel(thePos.GetData()[k], thePos.GetData()[k] + keyWord.GetLength()); //设置处理区域
+		m_richEd.SetSelectionCharFormat(cf);
+	}
+#endif
+
 	if (newline)
 	{
 		SetSel(-1, -1);

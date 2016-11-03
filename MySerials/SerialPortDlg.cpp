@@ -459,6 +459,7 @@ afx_msg LRESULT CSerialPortDlg::OnCommRead(WPARAM wParam, LPARAM lParam)
 {
 	BYTE buffPreProcess[2048] = { 0, };
 	CString str = L"";
+	CString strbuf = L"";
 	int iSize = (m_CommThread.m_QueueRead).GetSize();
 	BYTE aByte;
 
@@ -471,9 +472,12 @@ afx_msg LRESULT CSerialPortDlg::OnCommRead(WPARAM wParam, LPARAM lParam)
 	for (int i = 0; i < iSize; i++)
 	{
 		(m_CommThread.m_QueueRead).GetByte(&aByte);
-		str.Format(L"%c", aByte);
+		str.Format(L"%c", aByte);	
 		pMainDlg->m_uartLogDlg->AddLog(str);
 	}
+
+
+
 	return 0;
 }
 
@@ -482,7 +486,5 @@ afx_msg LRESULT CSerialPortDlg::OnCommRead(WPARAM wParam, LPARAM lParam)
 
 void CSerialPortDlg::OnClose()
 {
-	// TODO:  在此添加消息处理程序代码和/或调用默认值
-	OnBnClickedBtnClosePort();
 	CDialogEx::OnClose();
 }
